@@ -1,12 +1,18 @@
 package com.example.baitap01
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.material3.Button
+import android.util.Log
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,12 +20,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import com.example.baitap01.ui.theme.Baitap01Theme
+import kotlin.random.Random
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +49,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun StudentInfo(modifier: Modifier = Modifier) {
+
+    var numberList by remember { mutableStateOf<ArrayList<Int>>(ArrayList()) }
+    var oddNumbers by remember { mutableStateOf<List<Int>>(emptyList()) }
+    var evenNumbers by remember { mutableStateOf<List<Int>>(emptyList()) }
+
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -45,7 +63,7 @@ fun StudentInfo(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.avatar),  // Đảm bảo sử dụng tên tệp hợp lệ
+            painter = painterResource(id = R.drawable.avatar),
             contentDescription = "Student Image",
             modifier = Modifier
                 .size(100.dp)
@@ -56,6 +74,30 @@ fun StudentInfo(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Nguyễn Văn Hoài", fontSize = 18.sp)
         Text(text = "22110327", fontSize = 14.sp)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(onClick = {
+            numberList = generateRandomNumbers(10)
+            oddNumbers = numberList.filter { it % 2 != 0 } as ArrayList<Int>
+            evenNumbers = numberList.filter { it % 2 == 0 } as ArrayList<Int>
+
+            Log.d("Generated Numbers", "Numbers: $numberList")
+            Log.d("Odd Numbers", "Odd: $oddNumbers")
+            Log.d("Even Numbers", "Even: $evenNumbers")
+        }) {
+            Text("Ex01_4")
+        }
+//        Spacer(modifier = Modifier.height(10.dp))
+//
+//        Text(text = "Generated Numbers: $numberList")
+//        Spacer(modifier = Modifier.height(10.dp))
+//        Text(text = "Odd Numbers: $oddNumbers")
+//        Spacer(modifier = Modifier.height(10.dp))
+//        Text(text = "Even Numbers: $evenNumbers")
+
+        Spacer(modifier = Modifier.height(20.dp))
+        ReverseAndUpperCaseString()
     }
 }
 
@@ -64,5 +106,59 @@ fun StudentInfo(modifier: Modifier = Modifier) {
 fun StudentInfoPreview() {
     Baitap01Theme {
         StudentInfo()
+    }
+}
+
+fun generateRandomNumbers(size: Int): ArrayList<Int> {
+    val randomNumbers = ArrayList<Int>()
+    for (i in 0 until size) {
+        randomNumbers.add(Random.nextInt(1, 20))
+    }
+    return randomNumbers
+}
+
+
+@Composable
+fun ReverseAndUpperCaseString() {
+    // Lưu trữ giá trị chuỗi nhập vào dưới dạng String
+    var input by remember { mutableStateOf("") }
+    var result by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        BasicTextField(
+            value = input,
+            onValueChange = { input = it },
+            modifier = Modifier.fillMaxWidth(),
+            decorationBox = { innerTextField ->
+                Box(modifier = Modifier.padding(16.dp)) {
+                    if (input.isEmpty()) {
+                        Text(text = "Enter a string", color = Color.Gray)
+                    }
+                    innerTextField()
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {
+            val reversedString = input.split(" ").reversed().joinToString(" ").uppercase()
+            result = reversedString
+            Toast.makeText(context, reversedString, Toast.LENGTH_SHORT).show()
+        }) {
+            Text(text = "Ex01_5")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Reversed and Uppercase: $result")
     }
 }
